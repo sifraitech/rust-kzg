@@ -9,7 +9,7 @@ use kzg::eth::c_bindings::blst_p1;
 use kzg::msm::precompute::PrecomputationTable;
 use kzg::G1LinComb;
 
-use core::fmt::{Debug, Formatter};
+use core::{fmt::{Debug, Formatter}, hash::Hash};
 
 use crate::kzg_proofs::g1_linear_combination;
 use crate::types::fp::CtFp;
@@ -33,6 +33,14 @@ use constantine_sys::{
 #[repr(C)]
 #[derive(Clone, Copy, Default)]
 pub struct CtG1(pub bls12_381_g1_jac);
+
+impl Hash for CtG1 {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        self.0.x.limbs.hash(state);
+        self.0.y.limbs.hash(state);
+        self.0.z.limbs.hash(state);
+    }
+}
 
 impl PartialEq for CtG1 {
     fn eq(&self, other: &Self) -> bool {
